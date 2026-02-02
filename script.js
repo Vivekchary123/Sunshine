@@ -1,9 +1,3 @@
-// Import Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// 🔁 PASTE YOUR CONFIG HERE
 const firebaseConfig = {
   apiKey: "AIzaSyDAoq9Umjl7galoK-8oKT_9Z__vSXKShag",
   authDomain: "sunshine-a50c2.firebaseapp.com",
@@ -14,32 +8,19 @@ const firebaseConfig = {
   measurementId: "G-6HHTF4KPWW"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// Form submit
-const form = document.getElementById("responseForm");
-const status = document.getElementById("status");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById("name").value;
-  const message = document.getElementById("message").value;
-
-  try {
-    await addDoc(collection(db, "responses"), {
-      name: name,
-      message: message,
-      createdAt: serverTimestamp()
-    });
-
-    status.innerText = "✅ Response saved successfully!";
-    form.reset();
-
-  } catch (error) {
-    status.innerText = "❌ Error saving response";
-    console.error(error);
-  }
-});
+function submitResponse(answer) {
+  db.collection("responses").add({
+    response: answer,
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
+    document.getElementById("status").innerText = "💛 Response saved!";
+    setTimeout(() => {
+      window.location.href = answer === "Yes" ? "yes.html" : "no.html";
+    }, 800);
+  })
+  .catch(err => console.error(err));
+}
